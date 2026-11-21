@@ -10,9 +10,6 @@
  */
 (() => {
   'use strict';
-  // Turns the extension's own fixed markup (icons, stop screen) into DOM nodes
-  // with DOMParser. Only constant strings from this file are passed in.
-  const fromMarkup = (markup) => [...new DOMParser().parseFromString(markup, 'text/html').body.childNodes];
   if (!globalThis.chrome?.storage) return;
 
   // ------------------------------------------------------------------ config
@@ -631,7 +628,7 @@
     g.dataset.reason = reason;
     const blocked = reason === 'video' || reason === 'channel';
     const shorts = reason === 'shorts';
-    g.replaceChildren(...fromMarkup(`
+    g.innerHTML = `
       <div class="avf-card">
         <div class="avf-badge ${blocked || shorts ? 'avf-badge-block' : ''}">${shorts ? 'SHORTS' : blocked ? 'BLOCKED' : 'AI'}</div>
         <h2></h2>
@@ -645,7 +642,7 @@
           ${blocked ? '<button data-act="unblock" class="avf-secondary">Unblock</button>'
     : '<button data-act="allow" class="avf-secondary" title="Never hide this channel\'s AI-labeled videos">Always allow this channel</button>'}`}
         </div>
-      </div>`));
+      </div>`;
     g.querySelector('h2').textContent =
       shorts ? 'YouTube Shorts are blocked'
         : reason === 'ai' ? 'YouTube labels this video as AI-generated or altered'
@@ -867,7 +864,7 @@
       row.className = 'avf-menu-item';
       row.setAttribute('role', 'menuitem');
       row.tabIndex = 0;
-      row.replaceChildren(...fromMarkup(it.icon));
+      row.innerHTML = it.icon;
       const s = document.createElement('span');
       s.textContent = it.label;
       row.appendChild(s);
@@ -965,7 +962,7 @@
       b = document.createElement('button');
       b.id = 'avf-hover-btn';
       b.title = 'Block video or channel';
-      b.replaceChildren(...fromMarkup(ICON_VIDEO));
+      b.innerHTML = ICON_VIDEO;
       b.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -1054,7 +1051,7 @@
       const b = document.createElement('button');
       b.className = 'avf-watch-btn';
       b.title = title;
-      b.replaceChildren(...fromMarkup(icon));
+      b.innerHTML = icon;
       const s = document.createElement('span');
       s.textContent = label;
       b.appendChild(s);

@@ -45,12 +45,10 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
   };
-  // Tooltip text is built from DOM nodes (never HTML strings), so data from an
-  // imported backup file can't inject markup.
-  const tip = (e, label, value) => {
+  const tip = (e, html) => {
     const t = $('tip');
-    if (label == null) { t.hidden = true; return; }
-    t.replaceChildren(`${label}: `, el('b', { textContent: String(value) }), ' hidden');
+    if (!html) { t.hidden = true; return; }
+    t.innerHTML = html;
     t.hidden = false;
     const w = t.offsetWidth;
     t.style.left = `${Math.min(e.clientX + 12, innerWidth - w - 8)}px`;
@@ -150,7 +148,7 @@
       }
       const hit = svg('rect', { class: 'hit', x: L + i * slot, y: T, width: slot, height: H - T - B });
       const label = p.d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-      hit.addEventListener('mousemove', (e) => tip(e, label, p.v));
+      hit.addEventListener('mousemove', (e) => tip(e, `${label}: <b>${p.v}</b> hidden`));
       hit.addEventListener('mouseleave', (e) => tip(e, null));
       g.append(hit);
       s.append(g);
@@ -181,7 +179,7 @@
         el('span', { className: 'lbl', textContent: WHERE[w] || w }),
         el('div', { className: 'track' }, el('div', { className: 'fill', style: `width:${n / max * 100}%` })),
         el('span', { className: 'val', textContent: fmt(n) }));
-      row.addEventListener('mousemove', (e) => tip(e, WHERE[w] || w, fmt(n)));
+      row.addEventListener('mousemove', (e) => tip(e, `${WHERE[w] || w}: <b>${fmt(n)}</b> hidden`));
       row.addEventListener('mouseleave', (e) => tip(e, null));
       return row;
     }) : [el('p', { className: 'empty', textContent: 'No data yet.' })]));
